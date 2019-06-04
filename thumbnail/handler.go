@@ -2,8 +2,8 @@ package thumbnail
 
 import (
 	"bytes"
-  "errors"
-  "strings"
+	"errors"
+	"github.com/disintegration/imaging"
 	"image"
 	"image/jpeg"
 	"image/png"
@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"github.com/disintegration/imaging"
+	"strings"
 )
 
 func Handler() http.HandlerFunc {
@@ -45,64 +45,64 @@ func Handler() http.HandlerFunc {
 
 		sendImage(w, thumbnailImage, imageType)
 
-  })
+	})
 
 }
 
 func getUrlParam(urlInput string) (string, error) {
-  u, err := url.Parse(urlInput)
-  if err != nil {
-     return "", err
-  }
-  return u.String(), nil
+	u, err := url.Parse(urlInput)
+	if err != nil {
+		return "", err
+	}
+	return u.String(), nil
 }
 
 func getSizeParam(size string) ([2]int, error) {
 
-  var sizes [2]int
+	var sizes [2]int
 
-  separator := "x"
-  initialSize := 100
+	separator := "x"
+	initialSize := 100
 
-  if size == "" {
-    sizes[0] = initialSize
-    sizes[1] = initialSize
-    return sizes, nil
-  }
+	if size == "" {
+		sizes[0] = initialSize
+		sizes[1] = initialSize
+		return sizes, nil
+	}
 
-  if !strings.Contains(size, separator) {
+	if !strings.Contains(size, separator) {
 
-    sizeNumber, err := strconv.Atoi(size)
+		sizeNumber, err := strconv.Atoi(size)
 
-    if err != nil {
-      return sizes, err
-    }
+		if err != nil {
+			return sizes, err
+		}
 
-    sizes[0] = sizeNumber
-    sizes[1] = sizeNumber
+		sizes[0] = sizeNumber
+		sizes[1] = sizeNumber
 
-    return sizes, nil
-  }
+		return sizes, nil
+	}
 
-  sizesAsStrings := strings.Split(size, separator)
+	sizesAsStrings := strings.Split(size, separator)
 
-  width, err := strconv.Atoi(sizesAsStrings[0])
+	width, err := strconv.Atoi(sizesAsStrings[0])
 
-  if err != nil {
-    return sizes, err
-  }
+	if err != nil {
+		return sizes, err
+	}
 
-  sizes[0] = width
+	sizes[0] = width
 
-  height, err := strconv.Atoi(sizesAsStrings[1])
+	height, err := strconv.Atoi(sizesAsStrings[1])
 
-  if err != nil {
-    return sizes, err
-  }
+	if err != nil {
+		return sizes, err
+	}
 
-  sizes[1] = height
+	sizes[1] = height
 
-  return sizes, nil
+	return sizes, nil
 
 }
 
@@ -128,21 +128,21 @@ func readImageFromUrl(url string) (image.Image, string, error) {
 		return nil, "", errors.New("COULD_NOT_READ_CONTENT_TYPE")
 	}
 
-  return decodedImage, imageType, nil
+	return decodedImage, imageType, nil
 
 }
 
 func sendImage(w http.ResponseWriter, img *image.NRGBA, imageType string) {
 
 	switch imageType {
-    case "image/png":
-      w.Header().Set("Content-Type", imageType)
-      sendPNG(w, img)
-    case "image/jpg", "image/jpeg":
-      w.Header().Set("Content-Type", imageType)
-      sendJPG(w, img)
-    default:
-      sendError(w, errors.New("CONTENT_TYPE_IMAGE_NOT_SOPPORTED"), http.StatusBadRequest)
+	case "image/png":
+		w.Header().Set("Content-Type", imageType)
+		sendPNG(w, img)
+	case "image/jpg", "image/jpeg":
+		w.Header().Set("Content-Type", imageType)
+		sendJPG(w, img)
+	default:
+		sendError(w, errors.New("CONTENT_TYPE_IMAGE_NOT_SOPPORTED"), http.StatusBadRequest)
 	}
 
 }
@@ -182,13 +182,13 @@ func sendBufferResponse(w http.ResponseWriter, buffer bytes.Buffer) {
 	if _, err := w.Write(buffer.Bytes()); err != nil {
 		sendError(w, errors.New("COULD_NOT_SEND_IMAGE"), http.StatusBadRequest)
 		return
-  }
+	}
 
 }
 
 func sendError(w http.ResponseWriter, message error, statusCode int) {
 
 	w.WriteHeader(statusCode)
-  w.Write([]byte(message.Error()))
+	w.Write([]byte(message.Error()))
 
 }

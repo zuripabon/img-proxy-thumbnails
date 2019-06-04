@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/spotahome/go-thumbnail"
 	"log"
 	"net/http"
 	"os"
-	"github.com/spotahome/go-thumbnail"
 )
 
 const DefaultPort = "9092"
@@ -17,15 +17,15 @@ func getServerPort() string {
 		return port
 	}
 
-  return DefaultPort
+	return DefaultPort
 
 }
 
 func printHelp() {
 
-  log.Print("Server started, listening on port " + getServerPort())
+	log.Print("Server started, listening on port " + getServerPort())
 
-  log.Println("Use /thumbnail?size=<size>&url=<imageUrl> to generate a thumbnail")
+	log.Println("Use /thumbnail?size=<size>&url=<imageUrl> to generate a thumbnail")
 
 }
 
@@ -33,8 +33,8 @@ func main() {
 
 	printHelp()
 
-  http.HandleFunc("/thumbnail", thumbnail.Handler())
+	http.HandleFunc("/thumbnail", thumbnail.Handler())
 
-  http.ListenAndServe(":"+getServerPort(), nil)
+	http.ListenAndServe(":"+getServerPort(), nil)
 
 }
