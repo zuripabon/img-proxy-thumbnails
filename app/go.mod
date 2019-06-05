@@ -1,7 +1,7 @@
-module img-proxy
+module app
 
 go 1.12
 
-require github.com/spotahome/go-thumbnail v0.0.1
+replace github.com/spotahome/imgproxy-server => ../server
 
-replace github.com/spotahome/go-thumbnail => ../thumbnail
+require github.com/spotahome/imgproxy-server v0.0.0-00010101000000-000000000000 // indirect

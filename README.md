@@ -12,3 +12,4 @@ To start up the server, move to the root directory and create the docker image b
 
   * Goroutines support for thumbnail conversion
   * Use a message queue broker  
+  * Caching Policies

@@ -1,4 +1,4 @@
-package thumbnail
+package server
 
 import (
 	"bytes"
@@ -14,38 +14,34 @@ import (
 	"strings"
 )
 
-func Handler() http.HandlerFunc {
+func ThumbnailHandler(prefix string, w http.ResponseWriter, r *http.Request) {
 
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	queryValues := r.URL.Query()
 
-		queryValues := r.URL.Query()
+	remoteImageUrl, err := getUrlParam(queryValues.Get("url"))
 
-		remoteImageUrl, err := getUrlParam(queryValues.Get("url"))
+	if err != nil {
+		sendError(w, errors.New("INVALID_IMAGE_URL"), http.StatusBadRequest)
+		return
+	}
 
-		if err != nil {
-			sendError(w, errors.New("INVALID_IMAGE_URL"), http.StatusBadRequest)
-			return
-		}
+	thumbnailSize, err := getSizeParam(queryValues.Get("size"))
 
-		thumbnailSize, err := getSizeParam(queryValues.Get("size"))
+	if err != nil {
+		sendError(w, errors.New("INVALID_IMAGE_SIZE"), http.StatusBadRequest)
+		return
+	}
 
-		if err != nil {
-			sendError(w, errors.New("INVALID_IMAGE_SIZE"), http.StatusBadRequest)
-			return
-		}
+	remoteImage, imageType, err := readImageFromUrl(remoteImageUrl)
 
-		remoteImage, imageType, err := readImageFromUrl(remoteImageUrl)
+	if err != nil {
+		sendError(w, err, http.StatusBadRequest)
+		return
+	}
 
-		if err != nil {
-			sendError(w, err, http.StatusBadRequest)
-			return
-		}
+	thumbnailImage := imaging.Resize(remoteImage, thumbnailSize[0], thumbnailSize[1], imaging.Lanczos)
 
-		thumbnailImage := imaging.Resize(remoteImage, thumbnailSize[0], thumbnailSize[1], imaging.Lanczos)
-
-		sendImage(w, thumbnailImage, imageType)
-
-	})
+	sendImage(w, thumbnailImage, imageType)
 
 }
 

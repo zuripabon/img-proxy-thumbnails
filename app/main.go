@@ -1,40 +1,22 @@
 package main
 
 import (
-	"github.com/spotahome/go-thumbnail"
-	"log"
-	"net/http"
+	"github.com/spotahome/imgproxy-server"
 	"os"
+	"os/signal"
+	"syscall"
 )
-
-const DefaultPort = "9092"
-
-func getServerPort() string {
-
-	port := os.Getenv("IMAGE_PROXY_PORT")
-
-	if port != "" {
-		return port
-	}
-
-	return DefaultPort
-
-}
-
-func printHelp() {
-
-	log.Print("Server started, listening on port " + getServerPort())
-
-	log.Println("Use /thumbnail?size=<size>&url=<imageUrl> to generate a thumbnail")
-
-}
 
 func main() {
 
-	printHelp()
+	s := server.StartServer()
 
-	http.HandleFunc("/thumbnail", thumbnail.Handler())
+	stop := make(chan os.Signal, 1)
 
-	http.ListenAndServe(":"+getServerPort(), nil)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+
+	<-stop
+
+	server.ShutdownServer(s)
 
 }
